@@ -27,12 +27,17 @@ def get_claude_config_path():
         return claude_config
 
     # Windows path
-    claude_config = (
-        home / "AppData" / "Roaming" / "Claude" / "claude_desktop_config.json"
-    )
+    claude_config = home / "AppData" / "Roaming" / "Claude" / "claude_desktop_config.json"
     if claude_config.parent.exists():
         return claude_config
 
+    # Windows — MSIX/Store-packaged Claude Desktop
+    packages_dir = home / "AppData" / "Local" / "Packages"
+    if packages_dir.exists():
+        for pkg_dir in packages_dir.glob("*Claude*"):
+            claude_config = pkg_dir / "LocalCache" / "Roaming" / "Claude" / "claude_desktop_config.json"
+            if claude_config.parent.exists():
+                return claude_config
     # Linux path
     claude_config = home / ".config" / "Claude" / "claude_desktop_config.json"
     if claude_config.parent.exists():
