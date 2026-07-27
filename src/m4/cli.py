@@ -13,6 +13,7 @@ import typer
 
 from m4.client import M4Client
 from m4.config import (
+    ensure_custom_datasets_loaded,
     get_active_backend,
     get_active_dataset,  # noqa: F401 - retained for compatibility patch targets
     get_dataset_parquet_root,
@@ -814,9 +815,7 @@ def dataset_init_cmd(
 
     logger.info(f"CLI 'init' called for dataset: '{dataset_name}'")
 
-    DatasetRegistry.load_custom_datasets(
-        get_m4_data_dir() / "datasets"
-    )
+    ensure_custom_datasets_loaded()
     
     dataset_key = dataset_name.lower()
     ds = DatasetRegistry.get(dataset_key)
