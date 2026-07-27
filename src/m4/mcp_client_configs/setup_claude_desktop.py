@@ -6,10 +6,14 @@ Automatically configures Claude Desktop to use the M4 MCP server.
 import json
 import os
 import shutil
+import sys
 from pathlib import Path
 
 from m4.config import get_active_backend
 
+if sys.platform == "win32":
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 def get_claude_config_path():
     """Get the Claude Desktop configuration file path."""
@@ -175,10 +179,10 @@ def setup_claude_desktop(
         existing_config = {}
         if claude_config_path.exists() and claude_config_path.stat().st_size > 0:
             try:
-                with open(claude_config_path) as f:
+                with open(claude_config_path, encoding="utf-8") as f:
                     existing_config = json.load(f)
                 print("Loaded existing Claude Desktop configuration")
-            except json.JSONDecodeError:
+            except (json.JSONDecodeError, UnicodeDecodeError):
                 print("Found corrupted config file, creating new configuration")
                 existing_config = {}
         else:
@@ -199,8 +203,8 @@ def setup_claude_desktop(
         claude_config_path.parent.mkdir(parents=True, exist_ok=True)
 
         # Write updated config
-        with open(claude_config_path, "w") as f:
-            json.dump(existing_config, f, indent=2)
+        with open(claude_config_path, "w", encoding="utf-8") as f:
+            json.dump(existing_config, f, indent=2, ensure_ascii=False)
 
         print("✅ Successfully configured Claude Desktop!")
         print(f"📁 Config file: {claude_config_path}")
